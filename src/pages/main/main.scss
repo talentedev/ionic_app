@@ -1,0 +1,40 @@
+page-main {
+  text-align: center;
+  .main-title {
+    // height: 12vh;
+  }
+  input, button {
+    border: none;
+  }
+  form {
+    input, button {
+      border-radius: 25px;
+      width: 100%;
+    }
+    input {
+      height: 50px;
+      background-color: #e6e6e6;
+      text-align: center;
+      margin-top: 10px;
+    }
+    button {
+      background-color: #4058c5;
+      color: white;
+      height: 40px;
+      margin-top: 15px;
+    }
+  }
+  #info_form {
+    margin-top: 20px;
+  }
+  .btn-half {
+    width: 100%;
+    background-color: #4058c5;
+    color: white;
+    height: 35px;
+    border-radius: 25px;
+  }
+  .main-footer {
+    // height: 25vh;
+  }
+}

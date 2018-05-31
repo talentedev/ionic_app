@@ -1,0 +1,145 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>{{numberOfRegistrants}} Registrants</ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content padding>
+  <ion-row justify-content-between padding-horizontal>
+      <button ion-button small round class="btn-half box-shadow" (click)="syncData()">Sync</button>
+      <button ion-button small round color="danger" class="btn-half box-shadow" (click)="clearData()">Clear All</button>
+  </ion-row>
+  <div padding>
+    <ion-segment [(ngModel)]="registrantsStatus">
+      <ion-segment-button value="all">
+        To Sync
+      </ion-segment-button>
+      <ion-segment-button value="success">
+        Synced
+      </ion-segment-button>
+      <ion-segment-button value="fail">
+        Error
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+  <div [ngSwitch]="registrantsStatus">
+    <ion-list *ngSwitchCase="'all'">
+      <ion-row justify-content-center>
+        <span>Total {{registrants.length}}</span>
+      </ion-row>
+      <ion-item *ngFor="let registrant of registrants">
+        <ion-row>
+          <ion-col col-5 class="p0">
+            <h2>First name</h2>
+          </ion-col>
+          <ion-col col-7 class="p0">
+            <p>: {{registrant.properties[0].value}}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col col-5 class="p0">
+            <h2>Pheramor ID</h2>
+          </ion-col>
+          <ion-col col-7 class="p0">
+            <p>: {{registrant.properties[3].value}}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col col-5 class="p0">
+            <h2>Email</h2>
+          </ion-col>
+          <ion-col col-7 class="p0">
+            <p>: {{registrant.properties[2].value}}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col col-5 class="p0">
+            <h2>Saved at</h2>
+          </ion-col>
+          <ion-col col-7 class="p0">
+            <p>: {{registrant.saved_at | date: 'yyyy-MM-dd h:mm:ss'}}</p>
+          </ion-col>
+        </ion-row>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngSwitchCase="'success'">
+      <ion-row justify-content-center>
+        <span>{{successedRegistrants.length}} synced successfully</span>
+      </ion-row>
+      <ion-item *ngFor="let successedRegistrant of successedRegistrants">
+        <ion-row>
+          <ion-col col-5 class="p0">
+            <h2>First name</h2>
+          </ion-col>
+          <ion-col col-7 class="p0">
+            <p>: {{successedRegistrant.properties[0].value}}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col col-5 class="p0">
+            <h2>Pheramor ID</h2>
+          </ion-col>
+          <ion-col col-7 class="p0">
+            <p>: {{successedRegistrant.properties[3].value}}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col col-5 class="p0">
+            <h2>Email</h2>
+          </ion-col>
+          <ion-col col-7 class="p0">
+            <p>: {{successedRegistrant.properties[2].value}}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col col-5 class="p0">
+            <h2>Saved at</h2>
+          </ion-col>
+          <ion-col col-7 class="p0">
+            <p>: {{successedRegistrant.saved_at | date: 'yyyy-MM-dd h:mm:ss'}}</p>
+          </ion-col>
+        </ion-row>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngSwitchCase="'fail'">
+      <ion-row justify-content-center>
+        <span>{{failedRegistrants.length}} failed to sync</span>
+      </ion-row>
+      <ion-item *ngFor="let failedRegistrant of failedRegistrants">
+        <ion-row>
+          <ion-col col-5 class="p0">
+            <h2>First name</h2>
+          </ion-col>
+          <ion-col col-7 class="p0">
+            <p>: {{failedRegistrant.properties[0].value}}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col col-5 class="p0">
+            <h2>Pheramor ID</h2>
+          </ion-col>
+          <ion-col col-7 class="p0">
+            <p>: {{failedRegistrant.properties[3].value}}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col col-5 class="p0">
+            <h2>Email</h2>
+          </ion-col>
+          <ion-col col-7 class="p0">
+            <p>: {{failedRegistrant.properties[2].value}}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col col-5 class="p0">
+            <h2>Saved at</h2>
+          </ion-col>
+          <ion-col col-7 class="p0">
+            <p>: {{failedRegistrant.saved_at | date: 'yyyy-MM-dd h:mm:ss'}}</p>
+          </ion-col>
+        </ion-row>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>

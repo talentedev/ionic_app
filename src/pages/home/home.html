@@ -1,0 +1,26 @@
+<ion-content padding>
+  <ion-grid>
+    <ion-row justify-content-center align-items-center class="home-logo">
+      <ion-col col-10 col-md-8>
+        <img [src]="logoUrl">
+      </ion-col>
+    </ion-row>
+    <ion-row justify-content-center align-items-center class="access-code-form">
+      <ion-col col-9>
+        <form>
+          <div>
+            <input type="text" placeholder="Access Code" id="access_code" class="box-shadow-inset" [(ngModel)]="accessCode" name="accessCode">
+          </div>
+          <div>
+            <button id="code_submit" (click)="login()" class="box-shadow">Enter</button>
+          </div>
+        </form>
+      </ion-col>
+    </ion-row>
+    <ion-row align-items-center class="watch-tutorial">
+      <ion-col>
+        <h2 (click)="openVideoTutorial()">Watch tutorial</h2>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

@@ -1,0 +1,40 @@
+<ion-content padding>
+  <ion-grid>
+    <ion-row align-items-center class="main-title">
+      <ion-col>
+        <h3>One more step to connect your ID with your account</h3>
+      </ion-col>
+    </ion-row>
+    <ion-row justify-content-center>
+      <ion-col col-10>
+        <form id="barcode_form">
+          <input type="text" placeholder="Pheramor ID" class="box-shadow-inset" [(ngModel)]="barCode" name="barCode" [textMask]="{mask: masks.barcode}">
+          <button class="box-shadow" (click)="scanBarcode()">Scan</button>
+        </form>
+        <form id="info_form">
+          <input type="text" placeholder="First name" class="box-shadow-inset" [(ngModel)]="first_name" name="first_name">
+          <input type="text" placeholder="Last name" class="box-shadow-inset" [(ngModel)]="last_name" name="last_name">
+          <input type="tel" placeholder="Phone number(optional)" class="box-shadow-inset" [(ngModel)]="phone_number" name="phone_number" [textMask]="{mask: masks.phoneNumber}">
+          <input type="email" placeholder="Email Address" class="box-shadow-inset" [(ngModel)]="email" name="email">
+          <input type="email" placeholder="Reenter Email Address" class="box-shadow-inset" [(ngModel)]="re_email" name="re_email">
+          <button class="box-shadow" (click)="submit()">Submit</button>
+        </form>
+      </ion-col>
+    </ion-row>
+    <ion-row justify-content-center align-items-center class="main-footer">
+      <ion-col col-10 class="mt">
+        <h5 class="m0">{{entries}} Registrants to sync</h5>
+      </ion-col>
+      <ion-col col-10>
+        <ion-row justify-content-center>
+          <ion-col col-6>
+            <button class="btn-half box-shadow" (click)="viewSyncData()">View</button>
+          </ion-col>
+        </ion-row>
+      </ion-col>
+      <ion-col col-10>
+        <h5 (click)="logout()">Log out</h5>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

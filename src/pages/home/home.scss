@@ -1,0 +1,28 @@
+page-home {
+  .home-logo, .access-code-form {
+    height: 30vh;
+  }
+  .watch-tutorial {
+    height: 30vh;
+    text-align: center;
+  }
+  #access_code {
+    font-size: 15px;
+    color: #666666;
+    border: none;
+    width: 100%;
+    height: 50px;
+    border-radius: 25px;
+    background-color: #e6e6e6;
+    text-align: center;
+  }
+  #code_submit {
+    font-size: 17px;
+    background-color: #4058c5;
+    color: #f1f1f1;
+    margin-top: 20px;
+    width: 100%;
+    height: 50px;
+    border-radius: 25px;
+  }
+}
