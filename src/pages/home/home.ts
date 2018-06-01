@@ -3,8 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { NavController, LoadingController, AlertController } from 'ionic-angular';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
 import { TimeoutError } from 'rxjs/util/TimeoutError';
+import { Storage } from '@ionic/storage';
 
 import { MainPage } from '../main/main';
+import { Constants } from "../../app/constants";
 
 @Component({
   selector: 'page-home',
@@ -14,10 +16,12 @@ export class HomePage {
 
   logoUrl = 'assets/imgs/logo.png'
   linkToYoutube = 'https://youtu.be/igppm2Ynbr4'
-  accessCode : string = ''
+  email : string = ''
+  password : string = ''
+  endpoint : string
 
-  constructor(public navCtrl: NavController, public loadingCtrl: LoadingController, public alertCtrl: AlertController, public http: HttpClient, private iab: InAppBrowser) {
-
+  constructor(public navCtrl: NavController, public loadingCtrl: LoadingController, public alertCtrl: AlertController, public http: HttpClient, private iab: InAppBrowser, private storage: Storage) {
+    this.endpoint = Constants.API_URL;
   }
 
   // Login to next screen with correnct access code.
@@ -30,8 +34,8 @@ export class HomePage {
     loader.present()
 
     let codeAlert = this.alertCtrl.create({
-      title: 'Wrong Access Code!',
-      subTitle: 'Your access code dont exist. Please retry with other Access Code.',
+      title: 'Login Failed!',
+      subTitle: 'Invalid email or password. Please retry with correct credential.',
       buttons: ['OK']
     });
 
@@ -47,13 +51,22 @@ export class HomePage {
       buttons: ['OK']
     });
 
-    var url = 'http://staffapi.pheramor.com//login.php?code=' + this.accessCode
+    var url = this.endpoint + '/login'
+    var data = {
+      email: this.email,
+      password: this.password
+    }
 
-    this.http.get(url).subscribe(resp => {
-      if (resp != null) {
-        this.navCtrl.push(MainPage, {
-          data: resp
-        })
+    this.http.post(url, data).subscribe(resp => {
+      var response : any = resp;
+      if (response.access_token != null) {
+
+        // Save token to local storage
+        this.storage.set('token', response.access_token)
+
+        // Go to main page
+        this.navCtrl.push(MainPage)
+
       } else {
         codeAlert.present()
         loader.dismiss()

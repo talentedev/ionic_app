@@ -1,3 +1,11 @@
+<ion-header>
+  <ion-toolbar no-border-top>
+    <ion-title>{{ userId }}</ion-title>
+    <button ion-button menuToggle right (click)="goToSettingPage()">
+      <ion-icon name="settings"></ion-icon>
+    </button>
+  </ion-toolbar>
+</ion-header>
 <ion-content padding>
   <ion-grid>
     <ion-row align-items-center class="main-title">

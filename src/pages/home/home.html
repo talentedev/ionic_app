@@ -9,7 +9,10 @@
       <ion-col col-9>
         <form>
           <div>
-            <input type="text" placeholder="Access Code" id="access_code" class="box-shadow-inset" [(ngModel)]="accessCode" name="accessCode">
+            <input type="email" placeholder="Email" id="email" class="box-shadow-inset" [(ngModel)]="email" name="email">
+          </div>
+          <div>
+            <input type="password" placeholder="Password" id="password" class="box-shadow-inset" [(ngModel)]="password" name="password">
           </div>
           <div>
             <button id="code_submit" (click)="login()" class="box-shadow">Enter</button>

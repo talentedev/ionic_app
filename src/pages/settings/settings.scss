@@ -1,12 +1,8 @@
-page-home {
-  .home-logo, .access-code-form {
-    height: 30vh;
+page-settings {
+  form {
+    margin-top: 10vh;
   }
-  .watch-tutorial {
-    height: 30vh;
-    text-align: center;
-  }
-  #email, #password {
+  #name, #email, #newPassword, #confirmPassword {
     margin-top: 10px;
     font-size: 15px;
     color: #666666;

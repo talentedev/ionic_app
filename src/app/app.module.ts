@@ -14,6 +14,7 @@ import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { MainPage } from '../pages/main/main';
 import { SyncPage } from '../pages/sync_data/sync_data';
+import { SettingsPage } from '../pages/settings/settings';
 import { DirectiveModule } from './modules/directives/directives.module';
 import { TimeoutInterceptor } from './services/timeout-interceptor';
 
@@ -22,7 +23,8 @@ import { TimeoutInterceptor } from './services/timeout-interceptor';
     MyApp,
     HomePage,
     MainPage,
-    SyncPage
+    SyncPage,
+    SettingsPage
   ],
   imports: [
     BrowserModule,
@@ -38,7 +40,8 @@ import { TimeoutInterceptor } from './services/timeout-interceptor';
     MyApp,
     HomePage,
     MainPage,
-    SyncPage
+    SyncPage,
+    SettingsPage
   ],
   providers: [
     StatusBar,

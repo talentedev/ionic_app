@@ -8,6 +8,8 @@ import { TimeoutError } from 'rxjs/util/TimeoutError';
 
 import { HomePage } from '../home/home';
 import { SyncPage } from '../sync_data/sync_data';
+import { SettingsPage } from '../settings/settings';
+import { Constants } from "../../app/constants";
 
 @Component({
   selector: 'page-main',
@@ -15,6 +17,7 @@ import { SyncPage } from '../sync_data/sync_data';
 })
 export class MainPage {
 
+  userId: string
   barCode: string = ''
   first_name: string = ''
   last_name: string = ''
@@ -22,12 +25,10 @@ export class MainPage {
   email: string = ''
   re_email: string = ''
   entries: number = 0
-  user_data: any
-  endpoint: string = 'https://pheramor.agilecrm.com/dev/'
-  username: string = ''
-  password: string = ''
+  userInfo: any
+  endpoint: string
   httpOptions: any
-  masks: any;
+  masks: any
 
   ionViewWillEnter(){
     this.storage.get('entries').then((val) => {
@@ -35,25 +36,30 @@ export class MainPage {
         this.entries = JSON.parse(val).length
       }
     });
+
+    this.storage.get('token').then((val) => {
+      this.httpOptions = {
+        headers: new HttpHeaders({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization' : 'Bearer ' + val,
+          'timeout': '${15000}'
+        })
+      }
+
+      this.getUser()
+    })
   }
 
   constructor(public navCtrl: NavController, public alertCtrl: AlertController, public loadingCtrl: LoadingController, public http: HttpClient, public navParams: NavParams, private barcodeScanner: BarcodeScanner, private storage: Storage) {
-    this.user_data = navParams.get('data')
-    this.username = this.user_data.staff_email
-    this.password = this.user_data.api_key
-    this.httpOptions = {
-      headers: new HttpHeaders({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization' : 'Basic ' + btoa(this.username + ':' + this.password),
-        'timeout': '${15000}'
-      })
-    };
 
     this.masks = {
       phoneNumber: ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/],
       barcode: [/[a-zA-Z]/, /[a-zA-Z]/, '-', /[0-9]/, /\d/, /\d/, /\d/, /\d/, '-', /\d/]
-    };
+    }
+
+    this.endpoint = Constants.API_URL
+
     this.init()
   }
 
@@ -72,6 +78,24 @@ export class MainPage {
         this.entries = JSON.parse(val).length
       }
     });
+  }
+
+  // Get account information
+  getUser() {
+    this.http.get(this.endpoint + '/me', this.httpOptions).subscribe(resp => {
+      var response : any = resp
+      this.userInfo = response
+      this.userId = response.name
+    }, error => {
+      console.log(error)
+    })
+  }
+
+  // Navigate to account setting page
+  goToSettingPage() {
+    this.navCtrl.push(SettingsPage, {
+      data: this.userInfo
+    })
   }
 
   // Scan barcode
@@ -305,7 +329,7 @@ export class MainPage {
   // Get data for http request
   makeRequestdata() {
     var data = {
-        'tags': [this.user_data.staff_tag, this.user_data.access_code],
+        'tags': [this.userInfo.staff_tag, this.userInfo.access_code],
         'properties': [
           {
             "type": "SYSTEM",
@@ -340,12 +364,13 @@ export class MainPage {
   // Move to saved data page
   viewSyncData() {
     this.navCtrl.push(SyncPage, {
-      data: this.user_data
+      data: this.userInfo
     })
   }
 
   // Log out
   logout() {
+    this.storage.set('token', '')
     this.navCtrl.push(HomePage)
   }
 

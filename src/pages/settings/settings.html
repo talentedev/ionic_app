@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Settings</ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content padding>
+  <ion-grid>
+    <ion-row justify-content-center align-items-center class="access-code-form">
+      <ion-col col-9>
+        <form>
+          <div>
+            <input type="text" placeholder="Name" id="name" class="box-shadow-inset" [(ngModel)]="name" name="name">
+          </div>
+          <div>
+            <input type="email" placeholder="Email" id="email" class="box-shadow-inset" [(ngModel)]="email" name="email">
+          </div>
+          <div>
+            <input type="password" placeholder="New Password" id="newPassword" class="box-shadow-inset" [(ngModel)]="newPassword" name="newPassword">
+          </div>
+          <div>
+            <input type="password" placeholder="Confirm Password" id="confirmPassword" class="box-shadow-inset" [(ngModel)]="confirmPassword" name="confirmPassword">
+          </div>
+          <div>
+            <button id="code_submit" (click)="change()" class="box-shadow">Save</button>
+          </div>
+        </form>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
