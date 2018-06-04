@@ -3,17 +3,16 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NavController, AlertController, LoadingController, NavParams  } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 
+import { Constants } from "../../app/constants";
+
 @Component({
   selector: 'page-sync',
   templateUrl: 'sync_data.html'
 })
 export class SyncPage {
 
-  endpoint: string = 'https://pheramor.agilecrm.com/dev/'
+  endpoint: string
   httpOptions: any
-  username: string = ''
-  password: string = ''
-  user_data: any
   registrantsStatus: string = 'all'
   numberOfRegistrants: number = 0
   registrants: any = []
@@ -23,17 +22,19 @@ export class SyncPage {
   countSyncFailed: number = 0
 
   constructor(public navCtrl: NavController, public alertCtrl: AlertController, public loadingCtrl: LoadingController, public http: HttpClient, public navParams: NavParams, private storage: Storage) {
-    this.user_data = navParams.get('data')
-    this.username = this.user_data.staff_email
-    this.password = this.user_data.api_key
-    this.httpOptions = {
-      headers: new HttpHeaders({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization' : 'Basic ' + btoa(this.username + ':' + this.password),
-        'timeout': '${15000}'
-      })
-    };
+
+    this.endpoint = Constants.API_URL
+
+    this.storage.get('token').then((val) => {
+      this.httpOptions = {
+        headers: new HttpHeaders({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization' : 'Bearer ' + val,
+          'timeout': '${15000}'
+        })
+      }
+    })
 
     this.init()
   }
@@ -71,16 +72,12 @@ export class SyncPage {
 
   // Synchronize data
   syncData() {
-
     let submittingLoader = this.loadingCtrl.create({
       content: 'Submitting...',
       dismissOnPageChange: true,
     })
     submittingLoader.present()
 
-    // for(let val in this.registrants) {
-    //   this.submit(this.registrants[val], submittingLoader)
-    // }
     if (this.registrants.length != 0) {
       this.successedRegistrants = []
       this.failedRegistrants = []
@@ -96,75 +93,31 @@ export class SyncPage {
   }
 
   // Submit data
-  submit(submittingLoader, count) {
+  submit(submittingLoader, count = 0) {
 
     var data = this.registrants[count]
 
-    var searchContactByEmailUrl = this.endpoint + 'api/contacts/search/email/' + data.properties[2].value
+    var addCustomerUrl = this.endpoint + '/customers'
 
-    this.http.get(searchContactByEmailUrl, this.httpOptions).subscribe(response => {
+    this.http.post(addCustomerUrl, data, this.httpOptions).subscribe(response => {
 
-      var searchContactByPheramorIDUrl = this.endpoint + 'api/search/?q=' + data.properties[3].value + '&page_size=10&type="PERSON"'
+      let resp : any = response
 
-      if (response == null) {
+      if (count < this.registrants.length) {
+        if (resp.status == false) {
 
-        this.http.get(searchContactByPheramorIDUrl, this.httpOptions).subscribe(resp => {
-          var email = ''
-          if (resp[0] != null) {
-            email = this.getEmail(resp[0].properties)
-          }
-          // The ID already exist
-          if (resp[0] != null && email != data.properties[2].value) {
-            this.failedRegistrants.push(data)
-            this.showResult(data, submittingLoader, false)
-            if (count < this.registrants.length) {
-              this.submit(submittingLoader, count + 1)
-            }
-          } else {  // The ID don't exist
-            var createContactUrl = this.endpoint + 'api/contacts'
+          this.failedRegistrants.push(data)
+          this.showResult(data, submittingLoader, false)
+          this.submit(submittingLoader, count + 1)
 
-            this.http.post(createContactUrl, data, this.httpOptions).subscribe(resp => {
-              this.successedRegistrants.push(data)
-              this.showResult(data, submittingLoader, true)
-              if (count < this.registrants.length) {
-                this.submit(submittingLoader, count + 1)
-              }
-            })
-          }
-        })
+        } else {  // The ID don't exist
 
-      } else {
-
-        this.http.get(searchContactByPheramorIDUrl, this.httpOptions).subscribe(resp => {
-          var email = ''
-          if (resp[0] != null) {
-            email = this.getEmail(resp[0].properties)
-          }
-          // The ID already exist
-          if (resp[0] != null && email != data.properties[2].value) {
-            this.failedRegistrants.push(data)
-            this.showResult(data, submittingLoader, false)
-            if (count < this.registrants.length) {
-              this.submit(submittingLoader, count + 1)
-            }
-          } else {  // The ID don't exist
-            var updateContactUrl = this.endpoint + 'api/contacts/edit-properties'
-            data.id = response['id']
-            this.http.put(updateContactUrl, data, this.httpOptions).subscribe(resp => {
-              // Update tags
-              var updateTagsUrl = this.endpoint + 'api/contacts/edit/tags'
-              this.http.put(updateTagsUrl, data, this.httpOptions).subscribe(resp => {
-                this.successedRegistrants.push(data)
-                this.showResult(data, submittingLoader, true)
-                if (count < this.registrants.length) {
-                  this.submit(submittingLoader, count + 1)
-                }
-              })
-            })
-          }
-        })
-
+          this.successedRegistrants.push(data)
+          this.showResult(data, submittingLoader, true)
+          this.submit(submittingLoader, count + 1)
+        }
       }
+
     }, error => {
       console.log('--------- Sync Error --------')
       console.log(JSON.stringify(error))
@@ -172,18 +125,9 @@ export class SyncPage {
     })
   }
 
-  // Get email value
-  getEmail(data) {
-    for(let key in data) {
-      if(data[key].name == 'email') {
-        return data[key].value
-      }
-    }
-    return ''
-  }
-
   // Clear Data
   clearData() {
+
     this.storage.set('entries', JSON.stringify([]))
     this.storage.set('successedRegistrants', JSON.stringify([]))
     this.storage.set('failedRegistrants', JSON.stringify([]))

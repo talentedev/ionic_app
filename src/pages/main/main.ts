@@ -126,114 +126,29 @@ export class MainPage {
       })
       loader.present()
 
-      var searchContactByEmailUrl = this.endpoint + 'api/contacts/search/email/' + this.email
+      let addCustomerUrl = this.endpoint + '/customers'
+      let data = this.makeRequestdata()
 
-      this.http.get(searchContactByEmailUrl, this.httpOptions).subscribe(response => {
-        console.log('--------- Search Contact Result --------')
-        console.log(JSON.stringify(response))
-        var requestData = this.makeRequestdata()
-        var searchContactByPheramorIDUrl = this.endpoint + 'api/search/?q=' + this.barCode.toUpperCase() + '&page_size=10&type="PERSON"'
-
-        if (response == null) {
-
-          this.http.get(searchContactByPheramorIDUrl, this.httpOptions).subscribe(resp => {
-
-            var email = ''
-            if (resp[0] != null) {
-              email = this.getEmail(resp[0].properties)
-            }
-            // The ID already exist
-            if (resp[0] != null && email != requestData.properties[2].value) {
-              loader.dismiss()
-              this.alertCtrl.create({
-                title: 'Contact creation failed!',
-                subTitle: 'The ID already exist. Please try with other ID.',
-                buttons: ['OK']
-              }).present()
-            } else {    // The ID don't exist
-              var createContactUrl = this.endpoint + 'api/contacts'
-
-              this.http.post(createContactUrl, requestData, this.httpOptions).subscribe(data => {
-                loader.dismiss()
-                this.alertCtrl.create({
-                  title: 'Success!',
-                  subTitle: 'New contact was created successfully.',
-                  buttons: ['OK']
-                }).present()
-                this.init()
-              }, error => {
-                loader.dismiss()
-                if (error instanceof TimeoutError) {
-                  this.showTimeoutAlert()
-                } else {
-                  this.showConnectionAlert()
-                }
-                this.saveData()
-              })
-            }
-
-          }, error => {
-            console.log('========== Contact Create Error ===========')
-            console.log(JSON.stringify(error))
-            loader.dismiss()
-            if (error instanceof TimeoutError) {
-              this.showTimeoutAlert()
-            } else {
-              this.showConnectionAlert()
-            }
-            this.saveData();
-          })
-          
+      this.http.post(addCustomerUrl, data, this.httpOptions).subscribe(response => {
+        
+        let resp : any = response
+        if (resp.status == true) {
+          loader.dismiss()
+          this.alertCtrl.create({
+            title: 'Success!',
+            subTitle: 'New contact was created successfully.',
+            buttons: ['OK']
+          }).present()
+          this.init()
         } else {
-
-          this.http.get(searchContactByPheramorIDUrl, this.httpOptions).subscribe(resp => {
-            console.log('============ Email ===========')
-            console.log(resp[0])
-            var email = ''
-            if (resp[0] != null) {
-              email = this.getEmail(resp[0].properties)
-            }
-            // The ID already exist
-            if (resp[0] != null && email != requestData.properties[2].value) {
-              loader.dismiss()
-              this.alertCtrl.create({
-                title: 'Contact creation failed!',
-                subTitle: 'The ID already exist. Please try with other ID.',
-                buttons: ['OK']
-              }).present()
-            } else {  // The ID don't exist
-              console.log('------------ Update Contact ------------------')
-              console.log(response['id'])
-              var updateContactUrl = this.endpoint + 'api/contacts/edit-properties'
-              requestData['id'] = response['id']
-
-              this.http.put(updateContactUrl, requestData, this.httpOptions).subscribe(data => {
-                // Update tags
-                var updateTagsUrl = this.endpoint + 'api/contacts/edit/tags'
-                this.http.put(updateTagsUrl, requestData, this.httpOptions).subscribe(data => {
-                  loader.dismiss()
-                  this.alertCtrl.create({
-                    title: 'Success!',
-                    subTitle: 'Contact was updated successfully.',
-                    buttons: ['OK']
-                  }).present()
-                  this.init()
-                })
-              }, error => {
-                console.log('--------- Contact Update Error --------')
-                console.log(JSON.stringify(error))
-                loader.dismiss()
-                if (error instanceof TimeoutError) {
-                  this.showTimeoutAlert()
-                } else {
-                  this.showConnectionAlert()
-                }
-                this.saveData()
-              })
-            }
-          })
-
+          loader.dismiss()
+          this.alertCtrl.create({
+            title: 'Contact creation failed!',
+            subTitle: 'The ID already exist. Please try with other ID.',
+            buttons: ['OK']
+          }).present()
         }
+
       }, error => {
         console.log('--------- Submitting Error --------')
         console.log(JSON.stringify(error))
@@ -246,16 +161,6 @@ export class MainPage {
         }
       })
     }
-  }
-
-  // Get email value
-  getEmail(data) {
-    for(let key in data) {
-      if(data[key].name == 'email') {
-        return data[key].value
-      }
-    }
-    return ''
   }
 
   // Show Connection Error Alert
@@ -285,7 +190,7 @@ export class MainPage {
 
       var existId = false
       for(let key in savedData) {
-        if(savedData[key].properties[3].value == data.properties[3].value) {
+        if(savedData[key].pheramor_id == data.pheramor_id) {
           existId = true
         } else {
           existId = false
@@ -299,7 +204,7 @@ export class MainPage {
       } else {
         this.alertCtrl.create({
           title: 'ID Error!',
-          subTitle: 'The ID already exist on local database.',
+          subTitle: 'The Pheramor ID already exist on local database.',
           buttons: ['OK']
         }).present()
       }
@@ -328,36 +233,15 @@ export class MainPage {
 
   // Get data for http request
   makeRequestdata() {
+
     var data = {
-        'tags': [this.userInfo.staff_tag, this.userInfo.access_code],
-        'properties': [
-          {
-            "type": "SYSTEM",
-            "name": "first_name",
-            "value": this.first_name
-          },
-          {
-            "type": "SYSTEM",
-            "name": "last_name",
-            "value": this.last_name
-          },
-          {
-            "type": "SYSTEM",
-            "name": "email",
-            "value": this.email
-          },
-          {
-            "name": "Pheramor ID",
-            "type": "CUSTOM",
-            "value": this.barCode.toUpperCase()
-          },
-          {
-            "name": "Phone Number",
-            "type": "CUSTOM",
-            "value": this.phone_number.replace(/\D+/g, '')
-          }
-        ]
-      }
+      pheramor_id: this.barCode.toUpperCase(),
+      sales_email: this.email,
+      first_name: this.first_name,
+      last_name: this.last_name,
+      phone: this.phone_number.replace(/\D+/g, '')
+    }
+
     return data
   }
 

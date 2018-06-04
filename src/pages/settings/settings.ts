@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LoadingController, AlertController, NavParams } from 'ionic-angular';
-import { TimeoutError } from 'rxjs/util/TimeoutError';
 import { Storage } from '@ionic/storage';
 
 import { Constants } from "../../app/constants";
