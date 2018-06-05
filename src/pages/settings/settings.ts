@@ -81,7 +81,7 @@ export class SettingsPage {
       if (response.status) {
         this.alertCtrl.create({
           title: 'Success!',
-          subTitle: 'Account information changed successfully.',
+          subTitle: 'Password changed successfully.',
           buttons: ['OK']
         }).present()
       }
